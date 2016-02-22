@@ -14,7 +14,6 @@
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="bower_components/bootstrap-material-design/dist/css/bootstrap-material-design.min.css" rel="stylesheet">
     <link href="bower_components/bootstrap-material-design/dist/css/ripples.min.css" rel="stylesheet">
-    <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link href="css/simple-sidebar.css" rel="stylesheet">
@@ -58,36 +57,33 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
-                        <h1>Reports</h1>
-                        <p>Reports Executed</p>
-<!--                         <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a> -->
+                        <h1>Report <span id="reportId"></span></h1>
                     </div>
                 </div>
-
                 <div class="row">
-                	<div class="col-lg-8">
-                	<table class="table">
-                	<thead>
-                	<tr>
-                		<th>
-                			Report
-                		</th>
-                		<th>
-                			Location
-                		</th>
-                		<th>
-                			Start Date
-                		</th>
-                		<th>
-                			Finish Date
-                		</th>
-                	</tr>
-                	</thead>
-                	<tbody id="reports"></tbody>
-                	</table>
-                	</div>
-                	<div class="col-lg-4"></div>
-                </div>
+                  <div class="col-lg-12">
+                    <p><b>Date Created:</b> <span id="dateCreated"></span></p>
+                    <p><b>Date completed:</b> <span id="dateCompleted"></span></p>
+                    <p><b>Location:</b> <span id="location"></span></p>
+                    <p>
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>
+                                Component
+                              </th>
+                              <th>
+                                Report
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody id="report">
+
+                          </tbody>
+                        </table>
+                  </div>
+                <div>
+
             </div>
         </div>
         <!-- /#page-content-wrapper -->
@@ -106,6 +102,8 @@
     <script src="bower_components/q/q.js"></script>
     <script src="bower_components/hyperagent/dist/hyperagent.js"></script>
 
+    <script src="js/utilities.js"></script>
+
     <!-- Menu Toggle Script -->
     <script>
     $("#menu-toggle").click(function(e) {
@@ -116,18 +114,52 @@
 
 	<script type="text/javascript">
 
+    $(document).ready(function() {
+      loadReport();
+    });
 
-		var api = new Hyperagent.Resource("/api/report");
+    function loadReport() {
+      //get the passed report location
+      var link = getUrlParameter("link");
+      //set the id
+      $('#reportId').html(getReportId(link));
+      //load through the hyperagent
+      var api = new Hyperagent.Resource(link);
+      //check the results
+      api.fetch().then(function(report) {
+        $('#dateCreated').html(report.props.createdDate);
+        $('#dateCompleted').html(report.props.completedDate);
+        $('#location').html(report.props.location);
+        //now get the report and convert to an object (it's in JSON format)
+        var reportObject = $.parseJSON(report.props.content);
+        $('#report').empty();
+        $.each(reportObject,function(key,val) {
+          var row = "<tr>";
+          $.each(val,function(rowid,data) {
+            row += "<td>";
+            row += rowid;
+            row += "</td><td>";
+            row += data;
+            row += "</td>";
+          });
+          row += "</tr>";
+          $('#report').append(row);
+        });
+        // $('#report').html(report.props.content);
+      });
+    }
+
+
 
 		function loadReports() {
+      var api = new Hyperagent.Resource("/api/report");
 			//url --> '/api/reports'
 			api.fetch().then(function(root) {
 				$('#reports').empty();
 				$.each(root.embedded.reports,function(key,val){
-          console.log(val._options.url);
-					var row = "<tr><td><a href='/report.html?link=";
-          row += val._options.url;
-          row += "'><i class='fa fa-eye'></i>";
+					var row = "<tr><td>";
+
+// 					row += location;
 					row += "</td><td>";
 					row += val.props.location;
 					row += "</td><td>";

@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -18,15 +20,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class SimpleDirectoryScanService extends AbstractScanService implements DirectoryScanService {
 
 	private static final Log logger = LogFactory.getLog(SimpleDirectoryScanService.class);
-	
+
 	@Autowired
 	private ContentService contentService;
-	
+
 	@Autowired
 	private ObjectMapper mapper;
-	
+
 	//starts a scan and processes it by assuming the location is a directory location
-	//from this it looks for a key file list (e.g. config xml, properties, etc.) and 
+	//from this it looks for a key file list (e.g. config xml, properties, etc.) and
 	//where their location is (e.g. going to be packaged into the jar, or externalized
 	//somewhere else
 	@Override
@@ -51,7 +53,7 @@ public class SimpleDirectoryScanService extends AbstractScanService implements D
 		}//end if
 		//now get the files and loop
 		Iterator<File> files = FileUtils.iterateFiles(directory, null, true);
-		Map<String,String> reportContent = new HashMap<String,String>();
+		List<Map<String,String>> reports = new ArrayList<Map<String,String>>();
 		//loop and check
 		while (files.hasNext()) {
 			File f = files.next();
@@ -62,13 +64,15 @@ public class SimpleDirectoryScanService extends AbstractScanService implements D
 				//have a 'hit'
 				//generate a 'report' and add to the map
 				//TODO - fix report generation
+				Map<String,String> reportContent = new HashMap<String,String>();
 				reportContent.put(path, "not CNA");
+				reports.add(reportContent);
 			}//end if
 		}//end while
 		//process the report
 		String content;
 		try {
-			content = mapper.writeValueAsString(reportContent);
+			content = mapper.writeValueAsString(reports);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}

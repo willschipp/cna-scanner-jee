@@ -58,16 +58,21 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1>Simple Scanner</h1>
-                        <p>Upload a zip/jar for scanning for Cloud Native Architecture compatibility.</p> 
+                        <p>Upload a zip/jar for scanning for Cloud Native Architecture compatibility.</p>
 <!--                         <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a> -->
                     </div>
                 </div>
-                
+
                 <div class="row">
+                  <div class="col-lg-4">
                 	<form class="form" id="scanForm">
                 		<input type="text" id="urlField" name="urlField" class="inputcontrol" placeholder="URL..."/>
-                		<input type="submit" value="Scan"/> 
+                		<input type="submit" value="Scan"/>
                 	</form>
+                  </div>
+                  <div class="col-lg-8">
+                    <p>Report Id: <span id="reportId"></span></p>
+                  </div>
                 </div>
             </div>
         </div>
@@ -88,10 +93,11 @@
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
     });
-    
+
     $('#scanForm').submit(function(e) {
     	e.preventDefault;
-    	
+      $('#reportId').html('');//reset
+
     	//build the url
     	var url = '/api/scan-service?location=' + $('#urlField').val();
     	//submit
@@ -99,16 +105,20 @@
     		url:url,
     		method:'GET',
     		success:function(data) {
-    			console.log(data);
+          var link = "<a href='/report.html?link=/api/report/";
+          link += data;
+          link += "'>";
+          link += data;
+          link += "</a>";
+          $('#reportId').html(link);
     		}
     	});
-    	
+
     	return false;
     });
-    
+
     </script>
 
 </body>
 
 </html>
-
