@@ -41,6 +41,12 @@ public class SimpleDirectoryScanService extends AbstractScanService implements D
 		//return
 		return reportId;
 	}
+	
+	
+	protected void extractJar(String location) {
+		//TODO extract to a location
+		//TODO then run location as a scan source
+	}
 
 	protected void execute(Long id,String location) {
 		//load the directory

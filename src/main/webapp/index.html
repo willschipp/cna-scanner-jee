@@ -64,16 +64,45 @@
                 </div>
 
                 <div class="row">
-                  <div class="col-lg-4">
+                  <div class="col-lg-12">
                 	<form class="form" id="scanForm">
                 		<input type="text" id="urlField" name="urlField" class="inputcontrol" placeholder="URL..."/>
                 		<input type="submit" value="Scan"/>
                 	</form>
                   </div>
-                  <div class="col-lg-8">
-                    <p>Report Id: <span id="reportId"></span></p>
-                  </div>
                 </div>
+                
+                <div class="row">
+                  <div class="col-lg-12">
+                	<form class="form" id="uploadForm">
+                		<input type="file" id="file" name="file" class="inputcontrol"/>
+                		<input type="submit" value="Upload"/>
+                	</form>
+                  </div>
+                </div>                
+
+				<div class="row">
+					<div class="col-lg-12" style="overflow:auto;height:200px">
+					<table class="table">
+					<thead>
+						<tr>
+							<th>File Name</th>
+							<th>Select</th>
+						</tr>
+					</thead>
+					<tbody id="uploadedFiles">
+					
+					</tbody>
+					</table>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+                    	<p>Report Id: <span id="reportId"></span></p>					
+					</div>
+				</div>
+                
             </div>
         </div>
         <!-- /#page-content-wrapper -->
@@ -86,6 +115,11 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    
+    <script src="bower_components/uri.js/src/URI.js"></script>
+    <script src="bower_components/uri.js/src/URITemplate.js"></script>
+    <script src="bower_components/q/q.js"></script>
+    <script src="bower_components/hyperagent/dist/hyperagent.js"></script>    
 
     <!-- Menu Toggle Script -->
     <script>
@@ -93,6 +127,73 @@
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
     });
+    
+    $(document).ready(function() {
+    	loadUploadedFiles();
+    });
+    
+    
+    $('#uploadForm').submit(function(e) {
+    	e.preventDefault;
+    	var data = new FormData(this);
+
+    	$.ajax({
+    		url:'/api/scan-service/upload',
+    		type:'POST',
+    		data: data,
+    		cache:false,
+    		dataType:'json',
+    		processData:false,
+    		contentType:false,
+    		success:function(data,textStatus,jqXHR) {
+    			console.log(data);
+    			console.log(textStatus);
+    			console.log(jqXHR);
+    		},
+    		error:function(jqXHR,textStatus,errorThrown) {
+    			if (jqXHR.status == 200) {
+    				//it's actually ok
+    				loadUploadedFiles();
+    			}//end if
+    		}
+    	});
+    	return false;
+    });
+    
+    function loadUploadedFiles() {
+    	var api = new Hyperagent.Resource("/api/uploads");
+    	api.fetch().then(function(root) {
+    		$('#uploadedFiles').empty();
+    		$.each(root.embedded.uploadedFiles,function(key,value) {
+    			var row = "<tr><td>";
+    			row += value.props.name;
+    			row += "</td><td><button class='btn btn-default' data-id='";
+    			row += value._options.url;
+    			row += "'>Scan</button></td></tr>";
+    			$('#uploadedFiles').append(row);
+    			console.log(value);
+    		});
+    		
+    	});
+    }
+    
+    $('#uploadedFiles').on('click','button',function(e) {
+    	var link = $(e.target).data('id');
+    	//invoke
+    	$.ajax({
+    		url:'/api/scan-service/upload?link=' + link,
+    		method:'GET',
+    		success:function(data) {
+    	          var link = "<a href='/report.html?link=/api/report/";
+    	          link += data;
+    	          link += "'>";
+    	          link += data;
+    	          link += "</a>";
+    	          $('#reportId').html(link);    			
+    		}
+    	});
+    });
+    
 
     $('#scanForm').submit(function(e) {
     	e.preventDefault;
