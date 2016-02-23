@@ -28,6 +28,9 @@ public class Report {
 	
 	@Column(length=4000)
 	private String content;
+	
+	@Column
+	private String status;
 
 	public Long getId() {
 		return id;
@@ -70,11 +73,20 @@ public class Report {
 		this.content = content;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
 		return "Report [id=" + id + ", createdDate=" + createdDate + ", completedDate=" + completedDate + ", location="
-				+ location + ", content=" + content + "]";
+				+ location + ", content=" + content + ", status=" + status + "]";
 	}
+
 
 	
 	

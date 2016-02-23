@@ -131,50 +131,30 @@
         $('#dateCompleted').html(report.props.completedDate);
         $('#location').html(report.props.location);
         //now get the report and convert to an object (it's in JSON format)
+		$('#report').empty();
         var reportObject = $.parseJSON(report.props.content);
-        $('#report').empty();
-        $.each(reportObject,function(key,val) {
-          var row = "<tr>";
-          $.each(val,function(rowid,data) {
-            row += "<td>";
-            row += rowid;
-            row += "</td><td>";
-            row += data;
-            row += "</td>";
-          });
-          row += "</tr>";
-          $('#report').append(row);
-        });
+        if ($.isEmptyObject(reportObject)) {
+			var row ="<tr><td colspan='2'>No report details</td></tr>";
+			$('#report').append(row);
+        } else {
+            $.each(reportObject,function(key,val) {
+                var row = "<tr>";
+                $.each(val,function(rowid,data) {
+                  row += "<td>";
+                  row += rowid;
+                  row += "</td><td>";
+                  row += data;
+                  row += "</td>";
+                });
+                row += "</tr>";
+                $('#report').append(row);
+              });        	
+        }
+
         // $('#report').html(report.props.content);
       });
     }
 
-
-
-		function loadReports() {
-      var api = new Hyperagent.Resource("/api/report");
-			//url --> '/api/reports'
-			api.fetch().then(function(root) {
-				$('#reports').empty();
-				$.each(root.embedded.reports,function(key,val){
-					var row = "<tr><td>";
-
-// 					row += location;
-					row += "</td><td>";
-					row += val.props.location;
-					row += "</td><td>";
-					row += val.props.createdDate;
-					row += "</td><td>";
-					row += val.props.completedDate;
-					row += "</td></tr>";
-// 					var location = val.props.url();
-					//add
-					$('#reports').append(row);
-				});
-			});
-		}
-
-		loadReports();
 
 	</script>
 
