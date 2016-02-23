@@ -1,5 +1,7 @@
 package com.emc.awg.scanner;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -10,6 +12,7 @@ import org.springframework.util.StopWatch;
 import com.emc.awg.scanner.service.ReportService;
 import com.emc.awg.scanner.service.ScanService;
 import com.emc.awg.scanner.service.domain.Report;
+import com.emc.awg.scanner.service.domain.RuleSet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootApplication
@@ -24,6 +27,9 @@ public class Application implements CommandLineRunner {
 	
 	@Autowired
 	ReportService<Long> reportService;
+	
+	@Autowired
+	private RuleSet ruleSet;
 	
 	@Override
 	public void run(String... args) throws Exception {
@@ -42,5 +48,7 @@ public class Application implements CommandLineRunner {
 	ObjectMapper mapper() {
 		return new ObjectMapper();
 	}
+	
+
 
 }

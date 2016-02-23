@@ -13,7 +13,7 @@ public class SmokeIT {
 	public void test() throws Exception {
 		//setup a location
 //		runner.run("/Users/will/Documents/workspace-base/cna-scanner-jee");
-		Application.main(new String[]{"/Users/will/Documents/workspace-base/cna-scanner-jee"});
+		Application.main(new String[]{"/Users/willschipp/Documents/workspace-base/cna-scanner-jee"});
 	}
 
 }

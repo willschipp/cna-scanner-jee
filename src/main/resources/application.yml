@@ -1,0 +1,4 @@
+ruleset:
+  rules:
+    web.xml:  application has web xml
+    ejb: application has an ejb file
