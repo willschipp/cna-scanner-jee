@@ -1,7 +1,9 @@
 package com.emc.awg.scanner.service;
 
+import com.emc.awg.scanner.service.domain.Rule;
+
 public interface ContentService {
 
-	boolean isCNA(String path);
+	Rule isCNA(String path);
 	
 }

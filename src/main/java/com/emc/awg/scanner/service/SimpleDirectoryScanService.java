@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.emc.awg.scanner.service.domain.Rule;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -60,12 +61,10 @@ public class SimpleDirectoryScanService extends AbstractScanService implements D
 			//extract the path
 			String path = f.getAbsolutePath();
 			//now validate
-			if (!contentService.isCNA(path)) {
-				//have a 'hit'
-				//generate a 'report' and add to the map
-				//TODO - fix report generation
+			Rule rule = contentService.isCNA(path);
+			if (rule != null) {
 				Map<String,String> reportContent = new HashMap<String,String>();
-				reportContent.put(path, "not CNA");
+				reportContent.put(path, rule.getDescription());
 				reports.add(reportContent);
 			}//end if
 		}//end while
