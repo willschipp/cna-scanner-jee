@@ -65,6 +65,7 @@ public class SimpleDirectoryScanService extends AbstractScanService implements D
 				Map<String,String> reportContent = new HashMap<String,String>();
 				reportContent.put(path, rule.getDescription());
 				reports.add(reportContent);
+				reportContent.put(path, rule.getDescription());
 			}//end if
 		}//end while
 		//process the report

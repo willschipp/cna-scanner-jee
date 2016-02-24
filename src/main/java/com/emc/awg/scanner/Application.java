@@ -32,4 +32,5 @@ public class Application {
 	JarScanService jarScanService() {
 		return new JarScanService();
 	}
+
 }
