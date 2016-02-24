@@ -1,0 +1,226 @@
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Cloud Native Architecture - Compatibility Scanner</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bower_components/bootstrap-material-design/dist/css/bootstrap-material-design.min.css" rel="stylesheet">
+    <link href="bower_components/bootstrap-material-design/dist/css/ripples.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/simple-sidebar.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#">
+                        JEE Scanner
+                    </a>
+                </li>
+                <li>
+                    <a href="index.html">Scanner</a>
+                </li>
+                <li>
+                    <a href="reports.html">Reports</a>
+                </li>
+                <li>
+                    <a href="configuration.html">Configuration</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1>Simple Scanner</h1>
+                        <p>Upload a zip/jar for scanning for Cloud Native Architecture compatibility.</p>
+<!--                         <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a> -->
+                    </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-12">
+                	<form class="form" id="scanForm">
+                		<input type="text" id="urlField" name="urlField" class="inputcontrol" placeholder="URL..."/>
+                		<input type="submit" value="Scan"/>
+                	</form>
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-lg-12">
+                	<form class="form" id="uploadForm">
+                		<input type="file" id="file" name="file" class="inputcontrol"/>
+                		<input type="submit" value="Upload"/>
+                	</form>
+                  </div>
+                </div>                
+
+				<div class="row">
+					<div class="col-lg-12" style="overflow:auto;height:200px">
+					<table class="table">
+					<thead>
+						<tr>
+							<th>File Name</th>
+							<th>Select</th>
+						</tr>
+					</thead>
+					<tbody id="uploadedFiles">
+					
+					</tbody>
+					</table>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+                    	<p>Report Id: <span id="reportId"></span></p>					
+					</div>
+				</div>
+                
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    
+    <script src="bower_components/uri.js/src/URI.js"></script>
+    <script src="bower_components/uri.js/src/URITemplate.js"></script>
+    <script src="bower_components/q/q.js"></script>
+    <script src="bower_components/hyperagent/dist/hyperagent.js"></script>    
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    
+    $(document).ready(function() {
+    	loadUploadedFiles();
+    });
+    
+    
+    $('#uploadForm').submit(function(e) {
+    	e.preventDefault;
+    	var data = new FormData(this);
+
+    	$.ajax({
+    		url:'/api/scan-service/upload',
+    		type:'POST',
+    		data: data,
+    		cache:false,
+    		dataType:'json',
+    		processData:false,
+    		contentType:false,
+    		success:function(data,textStatus,jqXHR) {
+    			console.log(data);
+    			console.log(textStatus);
+    			console.log(jqXHR);
+    		},
+    		error:function(jqXHR,textStatus,errorThrown) {
+    			if (jqXHR.status == 200) {
+    				//it's actually ok
+    				loadUploadedFiles();
+    			}//end if
+    		}
+    	});
+    	return false;
+    });
+    
+    function loadUploadedFiles() {
+    	var api = new Hyperagent.Resource("/api/uploads");
+    	api.fetch().then(function(root) {
+    		$('#uploadedFiles').empty();
+    		$.each(root.embedded.uploadedFiles,function(key,value) {
+    			var row = "<tr><td>";
+    			row += value.props.name;
+    			row += "</td><td><button class='btn btn-default' data-id='";
+    			row += value._options.url;
+    			row += "'>Scan</button></td></tr>";
+    			$('#uploadedFiles').append(row);
+    			console.log(value);
+    		});
+    		
+    	});
+    }
+    
+    $('#uploadedFiles').on('click','button',function(e) {
+    	var link = $(e.target).data('id');
+    	//invoke
+    	$.ajax({
+    		url:'/api/scan-service/upload?link=' + link,
+    		method:'GET',
+    		success:function(data) {
+				alert('Report Finished');    			
+    	          var link = "<a href='/report.html?link=/api/report/";
+    	          link += data;
+    	          link += "'>";
+    	          link += data;
+    	          link += "</a>";
+    	          $('#reportId').html(link);    			
+    		}
+    	});
+    });
+    
+
+    $('#scanForm').submit(function(e) {
+    	e.preventDefault;
+      $('#reportId').html('');//reset
+
+    	//build the url
+    	var url = '/api/scan-service?location=' + $('#urlField').val();
+    	//submit
+    	$.ajax({
+    		url:url,
+    		method:'GET',
+    		success:function(data) {
+          var link = "<a href='/report.html?link=/api/report/";
+          link += data;
+          link += "'>";
+          link += data;
+          link += "</a>";
+          $('#reportId').html(link);
+    		}
+    	});
+
+    	return false;
+    });
+
+    </script>
+
+</body>
+
+</html>
