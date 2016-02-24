@@ -184,6 +184,7 @@
     		url:'/api/scan-service/upload?link=' + link,
     		method:'GET',
     		success:function(data) {
+				alert('Report Finished');    			
     	          var link = "<a href='/report.html?link=/api/report/";
     	          link += data;
     	          link += "'>";

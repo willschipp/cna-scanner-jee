@@ -3,6 +3,10 @@ spring:
     rest:
       base-path: /api
 
+multipart:
+  max-request-size: 50MB
+  max-file-size: 50MB
+
 ruleset:
   rules:
     web.xml:  application has web xml
